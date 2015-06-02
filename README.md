@@ -1,2 +1,2 @@
 # Text-Adventure
-A text adventure in Python.
+A text adventure in Python. Guidelines taken from Al Sweigart's guide to text games in Python.
