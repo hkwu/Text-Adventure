@@ -11,20 +11,26 @@ import sys
 import textwrap
 
 # some constant variables
+
+# for tiles
+PRINTNAME = 'printname'
 DESC = 'desc'
 NORTH = 'north'
 SOUTH = 'south'
 EAST = 'east'
 WEST = 'west'
-TILE = 'tile'
-#MERCH = 'merch'
-GROUND = 'ground'
-LISTDESC = 'listdesc'
-LOOKDESC = 'lookdesc'
-PICKABLE = 'pickable'
-EDIBLE = 'edible'
-DESCWORDS = 'descwords'
+GROUND = 'GROUND'
+#MERCHANT = 'merchant'
+#MOB = 'mob'
 
+# for items
+LONGDESC = 'longdesc'
+SHORTDESC = 'shortdesc'
+PICKABLE = 'pickable'
+#EDIBLE = 'edible'
+REFNAME = 'refname'
+
+# screen dimension
 SCREEN_WIDTH = 80
 
 # player variables
@@ -34,19 +40,48 @@ showFullExits = True
 
 # world data
 wTiles = {
-    'Spawn': {
-        DESC: "You spawned here.",
+    'spawn': {
+        PRINTNAME: "Forest Clearing",
+        DESC: ("A nondescript clearing. "
+               "There are trees all over. "
+               "The only way to go is north."),
         NORTH: "North of spawn.",
-        SOUTH: "South of spawn.",
-        EAST: "East of spawn.",
-        WEST: "West of spawn.",
-        GROUND: []
+        SOUTH: None,
+        EAST: None,
+        WEST: None,
+        GROUND: ["Shovel", "Tape"]
     }
 }
+
 
 # helper functions
 def location(tile):
     """
     prints out tile information
     """
-    pass
+    border_len = len(wTiles[tile][PRINTNAME])
+
+    print(":" * border_len)
+    print(wTiles[tile][PRINTNAME])
+    print(":" * border_len + "\n")
+
+    print("\n".join(textwrap.wrap(wTiles[tile][DESC], SCREEN_WIDTH)))
+
+    if wTiles[tile][GROUND]:
+        print("\nItems on the ground:")
+
+        for item in wTiles[tile][GROUND]:
+            print("%s" % item)
+    else:
+        print("There are no items on the ground.")
+
+    print("")
+
+    if wTiles[tile][NORTH]:
+        print("NORTH: " + wTiles[tile][NORTH])
+    if wTiles[tile][SOUTH]:
+        print("SOUTH: " + wTiles[tile][SOUTH])
+    if wTiles[tile][EAST]:
+        print("EAST: " + wTiles[tile][EAST])
+    if wTiles[tile][WEST]:
+        print("WEST: " + wTiles[tile][WEST])
