@@ -33,48 +33,17 @@ PICKABLE = 'pickable'
 # screen dimension
 SCREEN_WIDTH = 80
 
-# world data
-wTiles = {
-    'spawn': {
-        TILENAME: "Forest Clearing",
-        DESC: ("A nondescript clearing. "
-               "There are trees all over. "
-               "The only way to go is north."),
-        NORTH: "path0",
-        SOUTH: None,
-        EAST: None,
-        WEST: None,
-        GROUND: ['test', 'test', 'test']
-    },
-    'path0': {
-        TILENAME: "Forest Path",
-        DESC: "A trodden dirt path in the forest.",
-        NORTH: "path1",
-        SOUTH: None,
-        EAST: None,
-        WEST: None,
-        GROUND: []
-    }
-}
-
-wItems = {
-    'Iron Sword': {
-        DESC: "An iron sword. Built to last.",
-        PICKABLE: True
-    }
-}
-
 
 # possible replacement for dictionary tiles
-class BaseTile(object):
-    def __init__(self, name, desc, north, south, east, west, ground):
+class TravelTile(object):
+    def __init__(self, name, desc, north, 
+                 south, east, west):
         self.name = name
         self.desc = desc
         self.north = north
         self.south = south
         self.east = east
         self.west = west
-        self.ground = ground
 
     def location(self):
         """
@@ -108,6 +77,29 @@ class BaseTile(object):
         if self.west:
             print("WEST: %s" % self.west.name)
 
+
+class ItemTile(TravelTile):
+    def __init__(self, name, desc, north, 
+                 south, east, west, ground):
+        TravelTile.__init__(name, desc, north, south,
+                            east, west)
+        self.ground = ground
+
+    def pickup(self, item):
+        pass
+
+
+class NPCTile(ItemTile):
+    def __init__(self, name, desc, north, 
+                 south, east, west, ground,
+                 npc):
+        BaseTile.__init__(name, desc, north, south, 
+                          east, west, ground)
+        self.npc = npc
+
+    def talk(self, npc):
+        pass
+
 # world tiles
 path0 = BaseTile("Forest Path",
                  "A trodden dirt path in the forest",
@@ -121,12 +113,15 @@ spawn = BaseTile("Forest Clearing",
 
 
 # entity classes
+
+# base entity with name and location info
 class Entity(object):
     def __init__(self, name, loc):
         self.name = name
         self.loc = loc
 
 
+# player entity with additional traits
 class Player(Entity):
     def __init__(self, name, loc, coin):
         Entity.__init__(self, name, loc)
@@ -145,22 +140,23 @@ class Player(Entity):
             print(item)
 
     def move(self, direction):
-        if direction == NORTH and self.loc.north:
+        if direction.lower() == NORTH and self.loc.north:
             self.loc = self.loc.north
             self.loc.location()
-        elif direction == SOUTH and self.loc.south:
+        elif direction.lower() == SOUTH and self.loc.south:
             self.loc = self.loc.south
             self.loc.location()
-        elif direction == EAST and self.loc.east:
+        elif direction.lower() == EAST and self.loc.east:
             self.loc = self.loc.east
             self.loc.location()
-        elif direction == WEST and self.loc.west:
+        elif direction.lower() == WEST and self.loc.west:
             self.loc = self.loc.west
             self.loc.location()
         else:
             print("There is nothing over there!")
 
 
+# NPC entities
 class NPC(Entity):
     def __init__(self, name, loc, coin, inv):
         Entity.__init__(self, name, loc)
