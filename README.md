@@ -1,2 +1,2 @@
 # Text-Adventure
-A text adventure in Python. Guidelines taken from Al Sweigart's guide to text games in Python.
+A text adventure in Python. Kudos to Al Sweigart and Phillip Johnson for their Python text game guides.
