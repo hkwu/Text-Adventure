@@ -33,6 +33,18 @@ import textwrap
 # PICKABLE = 'pickable'
 # # EDIBLE = 'edible'
 
+# tile instances (legacy code)
+
+# path0 = TravelTile("Forest Path",
+#                    "A trodden dirt path in the forest",
+#                    None, None, None, None, [])
+# spawn = TravelTile("Forest Clearing",
+#                    ("A nondescript clearing. "
+#                     "There are trees all over. "
+#                     "The only way to go is north."),
+#                    path0, None, None, None,
+#                    ["test", "test"])
+
 # screen dimension
 SCREEN_WIDTH = 80
 
@@ -107,7 +119,7 @@ class NPCTile(TravelTile):
         pass
 
 
-# entity classes
+# entity classes #
 
 # base entity
 class Entity(object):
@@ -279,7 +291,7 @@ class Mob(Entity):
         self.desc = desc
 
 
-# item classes
+# item classes #
 
 # base item
 class Item(object):
@@ -310,18 +322,6 @@ class Armour(Item):
                  defence):
         Item.__init__(name, desc, price)
         self.defence = defence
-
-
-# tile instances (legacy code)
-# path0 = TravelTile("Forest Path",
-#                    "A trodden dirt path in the forest",
-#                    None, None, None, None, [])
-# spawn = TravelTile("Forest Clearing",
-#                    ("A nondescript clearing. "
-#                     "There are trees all over. "
-#                     "The only way to go is north."),
-#                    path0, None, None, None,
-#                    ["test", "test"])
 
 # using dictionaries to contain the class instances
 wTiles = {
@@ -400,12 +400,6 @@ class InputCmd(cmd.Cmd):
     def do_drop(self, arg):
         """\nDrop an item."""
         player.drop(arg)
-
-    # help topics
-    def help_movement(self):
-        cls()
-        print("Type NORTH [N], SOUTH [S], "
-              "EAST [E] or WEST [W] to travel.")
 
     # invalid command message
     def default(self, arg):
