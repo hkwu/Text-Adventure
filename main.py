@@ -401,6 +401,47 @@ class InputCmd(cmd.Cmd):
         """\nDrop an item."""
         player.drop(arg)
 
+    # help topics
+    def help_general(self):
+        cls()
+
+        help_msg = ("Welcome to the Python Text Adventure. "
+                    "The aim of the game is to explore the "
+                    "world and interact with the different "
+                    "entities within. For help at any time, "
+                    "enter HELP [?] to list help topics or "
+                    "type \"HELP <topic>\" to get specific "
+                    "information on a topic. You can QUIT [Q] "
+                    "the game at any time.")
+
+        print("\n".join(textwrap.wrap(help_msg, SCREEN_WIDTH)))
+
+    def help_movement(self):
+        cls()
+
+        help_msg = ("You can move to the NORTH [N], SOUTH [S], "
+                    "EAST [E] and WEST [W] in addition to going "
+                    "UP [U] or DOWN [D]. Explore as much as you want. "
+                    "If you need to remind yourself where you are, "
+                    "look up your LOCATION.")
+
+        print("\n".join(textwrap.wrap(help_msg, SCREEN_WIDTH)))
+
+    def help_interaction(self):
+        cls()
+
+        help_msg = ("There are different ways to interact with "
+                    "the game environment. If you see something "
+                    "you like, you can TAKE it and put it in your "
+                    "INVENTORY. You might also find it useful to "
+                    "DROP certain items when you don't want to clutter "
+                    "your pack. If you're in a rush, it's probably "
+                    "easier to just TAKE ALL or DROP ALL of those "
+                    "things at once. You can also EXAMINE people "
+                    "or items more closely.")
+
+        print("\n".join(textwrap.wrap(help_msg, SCREEN_WIDTH)))
+
     # invalid command message
     def default(self, arg):
         error_msg = ("That is not a valid command. "
