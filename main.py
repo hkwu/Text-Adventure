@@ -40,13 +40,16 @@ SCREEN_WIDTH = 80
 # tile classes
 class TravelTile(object):
     def __init__(self, name, desc, north,
-                 south, east, west, ground):
+                 south, east, west, up,
+                 down, ground):
         self.name = name
         self.desc = desc
         self.north = north
         self.south = south
         self.east = east
         self.west = west
+        self.up = up
+        self.down = down
         self.ground = ground
 
     def location(self):
@@ -81,14 +84,23 @@ class TravelTile(object):
             print("EAST: %s" % wTiles[self.east].name)
         if self.west:
             print("WEST: %s" % wTiles[self.west].name)
+        if self.up:
+            print("UP: %s" % wTiles[self.up].name)
+        if self.down:
+            print("DOWN: %s" % wTiles[self.down].name)
+
+        # events will appear under this border
+        print("")
+        print("~" * 20)
+        print("")
 
 
 class NPCTile(TravelTile):
     def __init__(self, name, desc, north,
-                 south, east, west, ground,
-                 npc):
+                 south, east, west, up,
+                 down, ground, npc):
         TravelTile.__init__(name, desc, north, south,
-                          east, west, ground)
+                            east, west, up, down, ground)
         self.npc = npc
 
     def talk(self, npc):
@@ -114,6 +126,7 @@ class Entity(object):
     def examine(self):
         """Examines the entity."""
         cls()
+        self.loc.location()
 
         print("You look at %s.\n" % self.name)
 
@@ -121,11 +134,14 @@ class Entity(object):
 
         if self.gender == "M":
             examining += "He"
-        else:
+        elif self.gender == "F":
             examining += "She"
+        else:
+            examining += "It"
 
         examining += " is wearing a %s and wields a %s." % (self.armour,
                                                             self.weapon)
+        print(examining)
 
 
 # player entity with additional traits
@@ -168,6 +184,12 @@ class Player(Entity):
         elif direction == "west" and self.loc.west:
             self.loc = wTiles[self.loc.west]
             self.loc.location()
+        elif direction == "up" and self.loc.up:
+            self.loc = wTiles[self.loc.up]
+            self.loc.location()
+        elif direction == "down" and self.loc.down:
+            self.loc = wTiles[self.loc.down]
+            self.loc.location()
         else:
             print("There is nothing over there!")
 
@@ -179,6 +201,7 @@ class Player(Entity):
         cls()
 
         if not item:
+            self.loc.location()
             print("What are you trying to take?")
         elif case_proper == "All" and self.loc.ground:
             for item in self.loc.ground:
@@ -186,12 +209,19 @@ class Player(Entity):
             
             self.loc.ground = []
 
+            self.loc.location()
             print("You take everything. Greedy!")
+        elif case_proper == "All":
+            self.loc.location()
+            print("There is nothing to take.")
         elif case_proper in self.loc.ground:
             self.loc.ground.remove(case_proper)
             self.inv.append(case_proper)
+
+            self.loc.location()
             print("You take the %s." % case_proper)
         else:
+            self.loc.location()
             print("That's not even on the ground.")
 
     def drop(self, item):
@@ -202,6 +232,7 @@ class Player(Entity):
         cls()
 
         if not item:
+            self.loc.location()
             print("What are you trying to drop?")
         elif case_proper == "All" and self.inv:
             for item in self.inv:
@@ -209,12 +240,19 @@ class Player(Entity):
 
             self.inv = []
 
+            self.loc.location()
             print("You drop everything on the ground.")
+        elif case_proper == "All":
+            self.loc.location()
+            print("You have nothing to drop.")
         elif case_proper in self.inv:
             self.inv.remove(case_proper)
             self.loc.ground.append(case_proper)
+
+            self.loc.location()
             print("You throw the %s on the ground." % case_proper)
         else:
+            self.loc.location()
             print("You don't even have one of those.")
 
 
@@ -250,7 +288,12 @@ class Item(object):
         self.desc = desc
         self.price = price
 
-    def examine("")
+    def examine(self):
+        cls()
+        self.loc.location()
+
+        print("You examine the %s.\n" % self.name)
+        print(self.desc + " It is worth %d coins." % self.price)
 
 
 # weapons
@@ -280,21 +323,29 @@ class Armour(Item):
 #                    path0, None, None, None,
 #                    ["test", "test"])
 
-# using dictionary to contain the tiles
+# using dictionaries to contain the class instances
 wTiles = {
     'spawn': TravelTile("Forest Clearing",
                         ("A nondescript clearing. "
                          "There are trees all over. "
                          "The only way to go is north."),
-                        'path0', None, None, None,
-                        ["Crumpled Note", "Sword"]),
+                        'path0', None, None, None, None,
+                        None, ["Crumpled Note", "Sword"]),
     'path0': TravelTile("Forest Path",
                         "A trodden dirt path in the forest",
-                        None, 'spawn', None, None, [])
+                        None, 'spawn', None, None, None, None, [])
 }
 
 # entity instances
 player = Player("Test")
+wNPC = {
+    
+}
+
+# item instances
+wItems = {
+    
+}
 
 
 # cmd interface class
@@ -333,6 +384,14 @@ class InputCmd(cmd.Cmd):
         """\nGo west."""
         player.move("west")
 
+    def do_up(self, arg):
+        """\nGo up."""
+        player.move("up")
+
+    def do_down(self, arg):
+        """\nGo down."""
+        player.move("down")
+
     # interaction functions
     def do_take(self, arg):
         """\nPick up an item."""
@@ -365,6 +424,8 @@ class InputCmd(cmd.Cmd):
     do_s = do_south
     do_e = do_east
     do_w = do_west
+    do_u = do_up
+    do_d = do_down
 
 
 # utility functions
@@ -378,7 +439,7 @@ if __name__ == '__main__':
     print("Python Text Adventure\n"
           "====================\n\n"
           "Press any key to begin.\n")
-    input("> ")
+    raw_input("> ")
     cls()
 
     player = Player("Test")
