@@ -9,36 +9,37 @@
 
 # required libraries
 import cmd
-import sys
+import os
+import string
 import textwrap
 
-# some constant variables
+# some constant variables (keeping them as legacy code for now)
 
-# for tiles
-TILENAME = 'tilename'
-DESC = 'desc'
-NORTH = 'north'
-SOUTH = 'south'
-EAST = 'east'
-WEST = 'west'
-GROUND = 'GROUND'
+# # for tiles
+# TILENAME = 'tilename'
+# DESC = 'desc'
+# NORTH = 'north'
+# SOUTH = 'south'
+# EAST = 'east'
+# WEST = 'west'
+# GROUND = 'GROUND'
 # MERCHANT = 'merchant'
 # MOB = 'mob'
 
-# for items
+# # for items
 # REFNAME = 'refname'
-LONGDESC = 'longdesc'
-SHORTDESC = 'shortdesc'
-PICKABLE = 'pickable'
-# EDIBLE = 'edible'
+# LONGDESC = 'longdesc'
+# SHORTDESC = 'shortdesc'
+# PICKABLE = 'pickable'
+# # EDIBLE = 'edible'
 
 # screen dimension
 SCREEN_WIDTH = 80
 
 
-# possible replacement for dictionary tiles
+# tile classes
 class TravelTile(object):
-    def __init__(self, name, desc, north, 
+    def __init__(self, name, desc, north,
                  south, east, west, ground):
         self.name = name
         self.desc = desc
@@ -52,6 +53,7 @@ class TravelTile(object):
         """
         prints location information
         """
+        cls()
         border_len = len(self.name)
 
         print(":" * border_len)
@@ -72,27 +74,20 @@ class TravelTile(object):
         print("")
 
         if self.north:
-            print("NORTH: %s" % self.north.name)
+            print("NORTH: %s" % wTiles[self.north].name)
         if self.south:
-            print("SOUTH: %s" % self.south.name)
+            print("SOUTH: %s" % wTiles[self.south].name)
         if self.east:
-            print("EAST: %s" % self.east.name)
+            print("EAST: %s" % wTiles[self.east].name)
         if self.west:
-            print("WEST: %s" % self.west.name)
-
-    def pickup(self, item):
-        """
-        moves pickable item to player's inventory
-        """
-        player.inv.append(item)
-        self.ground.remove(item)
+            print("WEST: %s" % wTiles[self.west].name)
 
 
 class NPCTile(TravelTile):
-    def __init__(self, name, desc, north, 
+    def __init__(self, name, desc, north,
                  south, east, west, ground,
                  npc):
-        BaseTile.__init__(name, desc, north, south, 
+        TravelTile.__init__(name, desc, north, south,
                           east, west, ground)
         self.npc = npc
 
@@ -123,7 +118,7 @@ class Entity(object):
 # player entity with additional traits
 class Player(Entity):
     def __init__(self, name):
-        Entity.__init__(self, name, spawn, [],
+        Entity.__init__(self, name, wTiles['spawn'], [],
                         50, None, None)
         self.hp = 100
         self.win = False
@@ -132,6 +127,8 @@ class Player(Entity):
         """
         print player's inventory
         """
+        cls()
+
         print("Inventory:")
 
         for item in self.inv:
@@ -141,25 +138,57 @@ class Player(Entity):
         """
         moves player in direction
         """
-        if direction.lower() == NORTH and self.loc.north:
-            self.loc = self.loc.north
+        if direction == "north" and self.loc.north:
+            self.loc = wTiles[self.loc.north]
             self.loc.location()
-        elif direction.lower() == SOUTH and self.loc.south:
-            self.loc = self.loc.south
+        elif direction == "south" and self.loc.south:
+            self.loc = wTiles[self.loc.south]
             self.loc.location()
-        elif direction.lower() == EAST and self.loc.east:
-            self.loc = self.loc.east
+        elif direction == "east" and self.loc.east:
+            self.loc = wTiles[self.loc.east]
             self.loc.location()
-        elif direction.lower() == WEST and self.loc.west:
-            self.loc = self.loc.west
+        elif direction == "west" and self.loc.west:
+            self.loc = wTiles[self.loc.west]
             self.loc.location()
         else:
             print("There is nothing over there!")
 
+    def take(self, item):
+        """
+        moves pickable item to player's inventory
+        """
+        case_proper = string.capwords(item)
+        cls()
+
+        if not item:
+            print("What are you trying to take?")
+        elif case_proper in self.loc.ground:
+            self.loc.ground.remove(case_proper)
+            self.inv.append(case_proper)
+            print("You take the %s." % case_proper)
+        else:
+            print("That's not even on the ground.")
+
+    def drop(self, item):
+        """
+        moves item to the ground
+        """
+        case_proper = string.capwords(item)
+        cls()
+
+        if not item:
+            print("What are you trying to drop?")
+        elif case_proper in self.inv:
+            self.inv.remove(case_proper)
+            self.loc.ground.append(case_proper)
+            print("You throw the %s on the ground." % case_proper)
+        else:
+            print("You don't even have one of those.")
+
 
 # NPC entities
 class NPC(Entity):
-    def __init__(self, name, desc, loc, 
+    def __init__(self, name, desc, loc,
                  inv, coin, weapon, armour,
                  lines):
         Entity.__init__(self, name, loc, inv,
@@ -197,16 +226,29 @@ class Armour(Item):
         self.defence = defence
 
 
-# tile instances
-path0 = TravelTile("Forest Path",
-                 "A trodden dirt path in the forest",
-                 None, None, None, None, [])
-spawn = TravelTile("Forest Clearing",
-                 ("A nondescript clearing. "
-                  "There are trees all over. "
-                  "The only way to go is north."),
-                 path0, None, None, None,
-                 ["test", "test"])
+# tile instances (legacy code)
+# path0 = TravelTile("Forest Path",
+#                    "A trodden dirt path in the forest",
+#                    None, None, None, None, [])
+# spawn = TravelTile("Forest Clearing",
+#                    ("A nondescript clearing. "
+#                     "There are trees all over. "
+#                     "The only way to go is north."),
+#                    path0, None, None, None,
+#                    ["test", "test"])
+
+# using dictionary to contain the tiles
+wTiles = {
+    'spawn': TravelTile("Forest Clearing",
+                        ("A nondescript clearing. "
+                         "There are trees all over. "
+                         "The only way to go is north."),
+                        'path0', None, None, None,
+                        ["Crumpled Note", "Sword"]),
+    'path0': TravelTile("Forest Path",
+                        "A trodden dirt path in the forest",
+                        None, 'spawn', None, None, [])
+}
 
 # entity instances
 player = Player("Test")
@@ -214,24 +256,93 @@ player = Player("Test")
 
 # cmd interface class
 class InputCmd(cmd.Cmd):
-    prompt = "\n>"
+    prompt = "\n> "
 
+    # interface functions
     def do_quit(self, arg):
+        """Quit the game."""
+        cls()
+
         return True
 
-    def help_quit(self):
-        print("Quit the game.")
+    def do_location(self, arg):
+        """Where am I?"""
+        player.loc.location()
 
+    def do_inventory(self, arg):
+        """Lists the items in your inventory."""
+        player.get_inv()
+
+    # movement functions
+    def do_north(self, arg):
+        """Go north."""
+        player.move("north")
+
+    def do_south(self, arg):
+        """Go south."""
+        player.move("south")
+
+    def do_east(self, arg):
+        """Go east."""
+        player.move("east")
+
+    def do_west(self, arg):
+        """Go west."""
+        player.move("west")
+
+    # interaction functions
+    def do_take(self, arg):
+        """Pick up an item."""
+        player.take(arg)
+
+    def do_drop(self, arg):
+        """Drop an item."""
+        player.drop(arg)
+
+    # help topics
     def help_movement(self):
-        print("Type the direction in which you want to move.")
+        cls()
+        print("Type NORTH [N], SOUTH [S], "
+              "EAST [E] or WEST [W] to travel.")
 
+    # invalid command message
     def default(self, arg):
+        cls()
         print("That is not a valid command. Please try again "
               "(try HELP for a list of commands).")
 
+    # aliases
+    do_q = do_Q = do_QUIT = do_quit
+    do_l = do_L = do_LOCATION = do_location
+    do_i = do_I = do_INVENTORY = do_inventory
+
+    do_n = do_N = do_NORTH = do_north
+    do_s = do_S = do_SOUTH = do_south 
+    do_e = do_E = do_EAST = do_east 
+    do_w = do_W = do_WEST = do_west
+
+    do_t = do_T = do_TAKE = do_take
+    do_d = do_D = do_DROP = do_drop
+
+    do_h = do_H = do_HELP = do_help
+
+
+# utility functions
+def cls():
+    """Clears the screen."""
+    os.system("cls" if os.name == "nt" else "clear")
+
 # input loop
 if __name__ == '__main__':
+    cls()
+    print("Python Text Adventure\n"
+          "====================\n\n"
+          "Press any key to begin.\n")
+    input("> ")
+    cls()
+
     player = Player("Test")
     player.loc.location()
     InputCmd().cmdloop()
+
     print("Game Over!")
