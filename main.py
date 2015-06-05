@@ -100,26 +100,39 @@ class NPCTile(TravelTile):
 # base entity
 class Entity(object):
     def __init__(self, name, loc, inv,
-                 coin, weapon, armour):
+                 coin, weapon, armour,
+                 desc, gender):
         self.name = name
         self.loc = loc
         self.inv = inv
         self.coin = coin
         self.weapon = weapon
         self.armour = armour
+        self.desc = desc
+        self.gender = gender
 
     def examine(self):
-        """
-        prints out details of the entity
-        """
-        pass
+        """Examines the entity."""
+        cls()
+
+        print("You look at %s.\n" % self.name)
+
+        examining = ""
+
+        if self.gender == "M":
+            examining += "He"
+        else:
+            examining += "She"
+
+        examining += " is wearing a %s and wields a %s." % (self.armour,
+                                                            self.weapon)
 
 
 # player entity with additional traits
 class Player(Entity):
     def __init__(self, name):
         Entity.__init__(self, name, wTiles['spawn'], [],
-                        50, None, None)
+                        50, None, None, None, None)
         self.hp = 100
         self.win = False
 
@@ -129,15 +142,20 @@ class Player(Entity):
         """
         cls()
 
-        print("Inventory:")
+        if self.inv:
+            print("Inventory:")
 
-        for item in self.inv:
-            print(item)
+            for item in self.inv:
+                print(item)
+        else:
+            print("Your inventory is empty.")
 
     def move(self, direction):
         """
         moves player in direction
         """
+        cls()
+
         if direction == "north" and self.loc.north:
             self.loc = wTiles[self.loc.north]
             self.loc.location()
@@ -162,6 +180,13 @@ class Player(Entity):
 
         if not item:
             print("What are you trying to take?")
+        elif case_proper == "All" and self.loc.ground:
+            for item in self.loc.ground:
+                self.inv.append(item)
+            
+            self.loc.ground = []
+
+            print("You take everything. Greedy!")
         elif case_proper in self.loc.ground:
             self.loc.ground.remove(case_proper)
             self.inv.append(case_proper)
@@ -178,6 +203,13 @@ class Player(Entity):
 
         if not item:
             print("What are you trying to drop?")
+        elif case_proper == "All" and self.inv:
+            for item in self.inv:
+                self.loc.ground.append(item)
+
+            self.inv = []
+
+            print("You drop everything on the ground.")
         elif case_proper in self.inv:
             self.inv.remove(case_proper)
             self.loc.ground.append(case_proper)
@@ -188,16 +220,25 @@ class Player(Entity):
 
 # NPC entities
 class NPC(Entity):
-    def __init__(self, name, desc, loc,
-                 inv, coin, weapon, armour,
-                 lines):
+    def __init__(self, name, gender, desc,
+                 loc, inv, coin, weapon,
+                 armour, lines):
         Entity.__init__(self, name, loc, inv,
-                        coin, weapon, armour)
-        self.desc = desc
+                        coin, weapon, armour, desc,
+                        gender)
         self.lines = lines
 
     def purchase(self, item):
         pass
+
+
+# mobs
+class Mob(Entity):
+    def __init__(self, name, desc, loc,
+                 inv, coin, weapon, armour):
+        Entity.__init__(self, name, loc, inv,
+                        coin, weapon, armour)
+        self.desc = desc
 
 
 # item classes
@@ -208,6 +249,8 @@ class Item(object):
         self.name = name
         self.desc = desc
         self.price = price
+
+    def examine("")
 
 
 # weapons
@@ -260,43 +303,43 @@ class InputCmd(cmd.Cmd):
 
     # interface functions
     def do_quit(self, arg):
-        """Quit the game."""
+        """\nQuit the game."""
         cls()
 
         return True
 
     def do_location(self, arg):
-        """Where am I?"""
+        """\nWhere am I?"""
         player.loc.location()
 
     def do_inventory(self, arg):
-        """Lists the items in your inventory."""
+        """\nLists the items in your inventory."""
         player.get_inv()
 
     # movement functions
     def do_north(self, arg):
-        """Go north."""
+        """\nGo north."""
         player.move("north")
 
     def do_south(self, arg):
-        """Go south."""
+        """\nGo south."""
         player.move("south")
 
     def do_east(self, arg):
-        """Go east."""
+        """\nGo east."""
         player.move("east")
 
     def do_west(self, arg):
-        """Go west."""
+        """\nGo west."""
         player.move("west")
 
     # interaction functions
     def do_take(self, arg):
-        """Pick up an item."""
+        """\nPick up an item."""
         player.take(arg)
 
     def do_drop(self, arg):
-        """Drop an item."""
+        """\nDrop an item."""
         player.drop(arg)
 
     # help topics
@@ -307,24 +350,21 @@ class InputCmd(cmd.Cmd):
 
     # invalid command message
     def default(self, arg):
+        error_msg = ("That is not a valid command. "
+                     "Please try again. "
+                     "Remember to type all commands in lowercase "
+                     "(check HELP [?] for a list of commands).")
         cls()
-        print("That is not a valid command. Please try again "
-              "(try HELP for a list of commands).")
+
+        print("\n".join(textwrap.wrap(error_msg, SCREEN_WIDTH)))
 
     # aliases
-    do_q = do_Q = do_QUIT = do_quit
-    do_l = do_L = do_LOCATION = do_location
-    do_i = do_I = do_INVENTORY = do_inventory
+    do_q = do_quit
 
-    do_n = do_N = do_NORTH = do_north
-    do_s = do_S = do_SOUTH = do_south 
-    do_e = do_E = do_EAST = do_east 
-    do_w = do_W = do_WEST = do_west
-
-    do_t = do_T = do_TAKE = do_take
-    do_d = do_D = do_DROP = do_drop
-
-    do_h = do_H = do_HELP = do_help
+    do_n = do_north
+    do_s = do_south
+    do_e = do_east
+    do_w = do_west
 
 
 # utility functions
