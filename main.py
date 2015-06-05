@@ -203,6 +203,7 @@ class Player(Entity):
             self.loc = wTiles[self.loc.down]
             self.loc.location()
         else:
+            self.loc.location()
             print("There is nothing over there!")
 
     def take(self, item):
@@ -325,15 +326,16 @@ class Armour(Item):
 
 # using dictionaries to contain the class instances
 wTiles = {
-    'spawn': TravelTile("Forest Clearing",
-                        ("A nondescript clearing. "
-                         "There are trees all over. "
-                         "The only way to go is north."),
-                        'path0', None, None, None, None,
-                        None, ["Crumpled Note", "Sword"]),
-    'path0': TravelTile("Forest Path",
-                        "A trodden dirt path in the forest",
-                        None, 'spawn', None, None, None, None, [])
+    'spawn': TravelTile("Midship Corridor",
+                        ("One of the many corridors in the ship. "
+                         "The path behind you is blocked by debris."),
+                        'path0', None, None, None, None, None, 
+                        ["Crumpled Note", "Sword"]),
+    'path0': TravelTile("Midship Corridor",
+                        ("One of the many corridors in the ship. "
+                         "The engines emit a low hum beyond the walls."),
+                        None, 'spawn', None, None, None, None, 
+                        [])
 }
 
 # entity instances
@@ -414,6 +416,10 @@ class InputCmd(cmd.Cmd):
                     "information on a topic. You can QUIT [Q] "
                     "the game at any time.")
 
+        print("=" * 7)
+        print("GENERAL")
+        print("=" * 7)
+        print("")
         print("\n".join(textwrap.wrap(help_msg, SCREEN_WIDTH)))
 
     def help_movement(self):
@@ -425,6 +431,10 @@ class InputCmd(cmd.Cmd):
                     "If you need to remind yourself where you are, "
                     "look up your LOCATION.")
 
+        print("=" * 8)
+        print("MOVEMENT")
+        print("=" * 8)
+        print("")
         print("\n".join(textwrap.wrap(help_msg, SCREEN_WIDTH)))
 
     def help_interaction(self):
@@ -440,16 +450,25 @@ class InputCmd(cmd.Cmd):
                     "things at once. You can also EXAMINE people "
                     "or items more closely.")
 
+        print("=" * 11)
+        print("INTERACTION")
+        print("=" * 11)
+        print("")
         print("\n".join(textwrap.wrap(help_msg, SCREEN_WIDTH)))
 
     # invalid command message
     def default(self, arg):
+        cls()
+
         error_msg = ("That is not a valid command. "
                      "Please try again. "
                      "Remember to type all commands in lowercase "
                      "(check HELP [?] for a list of commands).")
-        cls()
 
+        print("=" * 15)
+        print("INVALID COMMAND")
+        print("=" * 15)
+        print("")
         print("\n".join(textwrap.wrap(error_msg, SCREEN_WIDTH)))
 
     # aliases
