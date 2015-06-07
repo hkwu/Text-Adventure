@@ -9,10 +9,10 @@ __title__ = "Python Space Adventure (real name pending)"
 # text game guides
 
 # Required libraries
-import cmd
-import os
 import string
 import textwrap
+import cmd
+import os
 
 # Screen dimension
 SCREEN_WIDTH = 75
@@ -40,7 +40,7 @@ class TravelTile(object):
 
     def location(self):
         """
-        prints location information and sets visited status
+        Prints location information and sets visited status
         to True
         """
         cls()
@@ -49,19 +49,19 @@ class TravelTile(object):
             self.visited = True
 
             for paragraph in self.on_first_visit:
-                print(wrapStr(paragraph))
+                cls()
+                wrapStr(paragraph)
                 print("\nPress ENTER to continue.\n")
-                raw_input("> ")
+                dialoguePrompt()
 
         cls()
-
         border_len = len(self.name)
 
         print(":" * border_len)
         print(self.name)
         print(":" * border_len + "\n")
 
-        print(wrapStr(self.desc))
+        wrapStr(self.desc)
         print("")
 
         if self.ground:
@@ -154,9 +154,7 @@ class Player(Entity):
                         50, None, None, None, None)
 
     def get_inv(self):
-        """
-        print player's inventory
-        """
+        """Print player's inventory"""
         cls()
 
         if self.inv:
@@ -168,9 +166,7 @@ class Player(Entity):
             print("Your inventory is empty.")
 
     def move(self, direction):
-        """
-        moves player in direction
-        """
+        """Moves player in direction"""
         cls()
 
         if direction == "north" and self.loc.north:
@@ -196,9 +192,7 @@ class Player(Entity):
             print("There is nothing over there!")
 
     def take(self, item):
-        """
-        moves pickable item to player's inventory
-        """
+        """Moves pickable item to player's inventory"""
         case_proper = string.capwords(item)
         cls()
 
@@ -227,9 +221,7 @@ class Player(Entity):
             print("That's not even on the ground.")
 
     def drop(self, item):
-        """
-        moves item to the ground
-        """
+        """Moves item to the ground"""
         case_proper = string.capwords(item)
         cls()
 
@@ -292,7 +284,7 @@ class Item(object):
 
     def examine(self):
         cls()
-        self.loc.location()
+        player.loc.location()
 
         print("You examine the %s.\n" % self.name)
         print(self.desc + " It is worth %d coins." % self.price)
@@ -340,10 +332,35 @@ wTiles = {
                           "you looks a little different than it did before. "
                           "Dim auxiliary lighting has taken the place of the "
                           "usual overhead lamps, some of which have fallen "
-                          "out of the ceiling and flail helplessly around "
+                          "out of the ceiling and flail around helplessly "
                           "in their wires. Chairs, or at least those not "
-                          "bolted down, are scattered around the room.\n\n"
-                          "As you come to, another face hovers over you.")]),
+                          "bolted down, are scattered around the room.\n"
+                          "As you come to, a fuzzy face hovers over you."),
+                         ("Stranger: \"Are you awake? Take your time. "
+                          "We had quite a landing.\""),
+                         ("You ease yourself up against the wall. The "
+                          "unfamiliar face begins to sharpen and you "
+                          "manage to catch a glimpse of the name on "
+                          "her uniform."),
+                         ("Lt. Nates: \"What happened? Don't know. Hit "
+                          "some kind of trouble in the atmosphere. I "
+                          "know about as much as you. The ship got dragged "
+                          "down pretty quick. I've never seen anything like "
+                          "it. I overheard a couple of techs over IntraNet; "
+                          "they were saying something about a gravitational "
+                          "anomaly, but that's not really my expertise.\"\n"
+                          "Lt. Nates' eyes drift to your forehead.\n"
+                          "Lt. Nates: \"Hey, if you feel like you're up "
+                          "for it, would you mind heading to the bridge "
+                          "and asking around a bit? Figure out what's "
+                          "going on? I've got to stick around here and "
+                          "manage this mess. You can stop by the MedBay "
+                          "while you're at it.\"\n"
+                          "She glances over her shoulder.\n"
+                          "Lt. Nates: \"Oh, and I should probably mention "
+                          "that the PowerLift over there is down, so you'll "
+                          "need to find another way to get to the other "
+                          "floors. Best of luck!\"")]),
     'ctrl_storage': TravelTile("Bow Storage",
                                ("A medium-sized room that lies beyond "
                                 "the main controls, capable of storing "
@@ -362,9 +379,10 @@ wTiles = {
                               None),
     'ctrl_entrance': TravelTile("Control Station - Entry",
                                 ("You stand at the entry to the bow control "
-                                 "station. The airtight doors to the room have "
-                                 "jammed themselves open, and it doesn't look "
-                                 "like they'll be operational any time soon.\n\n"
+                                 "station. The airtight doors to the room "
+                                 "have jammed themselves open, and it doesn't "
+                                 "look like they'll be operational any time "
+                                 "soon."
                                  "To the left is the door to the west wing "
                                  "of the control station, which includes "
                                  "the officers' lounge. The door is locked "
@@ -498,7 +516,7 @@ class InputCmd(cmd.Cmd):
         print("GENERAL")
         print("=" * 7)
         print("")
-        print(wrapStr(help_msg))
+        wrapStr(help_msg)
 
     def help_movement(self):
         cls()
@@ -513,7 +531,7 @@ class InputCmd(cmd.Cmd):
         print("MOVEMENT")
         print("=" * 8)
         print("")
-        print(wrapStr(help_msg))
+        wrapStr(help_msg)
 
     def help_interaction(self):
         cls()
@@ -532,7 +550,7 @@ class InputCmd(cmd.Cmd):
         print("INTERACTION")
         print("=" * 11)
         print("")
-        print(wrapStr(help_msg))
+        wrapStr(help_msg)
 
     # Invalid command message
     def default(self, arg):
@@ -547,7 +565,7 @@ class InputCmd(cmd.Cmd):
         print("INVALID COMMAND")
         print("=" * 15)
         print("")
-        print(wrapStr(error_msg))
+        wrapStr(error_msg)
 
     # Aliases
     do_q = do_quit
@@ -562,13 +580,41 @@ class InputCmd(cmd.Cmd):
 
 # Utility functions
 def wrapStr(string):
-    """Textwraps a string using SCREEN and joins with newlines"""
-    return "\n".join(textwrap.wrap(string, SCREEN_WIDTH))
+    """
+    Textwraps a string using SCREEN_WIDTH 
+    and joins them with newlines, then prints
+    """
+    split_str = string.splitlines()
+
+    if len(split_str) == 1:
+        print("\n".join(textwrap.wrap(split_str[0], SCREEN_WIDTH)))
+    else:
+        index = 0
+
+        for paragraph in split_str:
+            print("\n".join(textwrap.wrap(paragraph, SCREEN_WIDTH)))
+
+            # We don't print extra line at end of entire dialogue
+            if index < len(split_str) - 1:
+                print("")
+
+            index += 1
 
 
 def cls():
     """Clears the screen."""
     os.system("cls" if os.name == "nt" else "clear")
+
+
+def dialoguePrompt():
+    """Special prompt for dialogue sequences that allows quitting."""
+    choice = raw_input("> ")
+    if choice.lower() == "q" or choice.lower() == "quit":
+        cls()
+        print("Game Over!")
+        raise SystemExit
+    else:
+        return
 
 
 # Input loop
@@ -585,12 +631,12 @@ if __name__ == '__main__':
                    "information on a topic. Type all commands "
                    "in lowercase. You can QUIT [Q] the game at "
                    "any time.")
-    print(wrapStr(welcome_msg))
-    print("\nPress ENTER to continue.\n")
-    raw_input("> ")
+    wrapStr(welcome_msg)
+    print("")
+    player_name = raw_input("What's your name? ")
     cls()
 
-    player = Player("Test")
+    player = Player(player_name)
     player.loc.location()
     InputCmd().cmdloop()
 
