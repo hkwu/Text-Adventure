@@ -1,6 +1,7 @@
 #! python3
 
-# Text adventure in Python (name pending)
+__title__ = "Python Space Adventure (real name pending)"
+
 # by Kelvin Wu
 # initial commit 2015-06-01
 
@@ -21,9 +22,11 @@ SCREEN_WIDTH = 75
 
 # Basic tile
 class TravelTile(object):
+    visited = False
+
     def __init__(self, name, desc, north,
                  south, east, west, up,
-                 down, ground):
+                 down, ground, on_first_visit):
         self.name = name
         self.desc = desc
         self.north = north
@@ -33,19 +36,32 @@ class TravelTile(object):
         self.up = up
         self.down = down
         self.ground = ground
+        self.on_first_visit = on_first_visit
 
     def location(self):
         """
-        prints location information
+        prints location information and sets visited status
+        to True
         """
         cls()
+
+        if not self.visited and self.on_first_visit:
+            self.visited = True
+
+            for paragraph in self.on_first_visit:
+                print(wrapStr(paragraph))
+                print("\nPress ENTER to continue.\n")
+                raw_input("> ")
+
+        cls()
+
         border_len = len(self.name)
 
         print(":" * border_len)
         print(self.name)
         print(":" * border_len + "\n")
 
-        print("\n".join(textwrap.wrap(self.desc, SCREEN_WIDTH)))
+        print(wrapStr(self.desc))
         print("")
 
         if self.ground:
@@ -81,9 +97,11 @@ class TravelTile(object):
 class NPCTile(TravelTile):
     def __init__(self, name, desc, north,
                  south, east, west, up,
-                 down, ground, npc):
+                 down, ground, npc,
+                 on_first_visit):
         TravelTile.__init__(name, desc, north, south,
-                            east, west, up, down, ground)
+                            east, west, up, down, ground,
+                            False, on_first_visit)
         self.npc = npc
 
     def talk(self, npc):
@@ -129,11 +147,11 @@ class Entity(object):
 
 # Player entity with additional traits
 class Player(Entity):
+    hp = 100
+
     def __init__(self, name):
         Entity.__init__(self, name, wTiles['spawn'], [],
                         50, None, None, None, None)
-        self.hp = 100
-        self.win = False
 
     def get_inv(self):
         """
@@ -190,7 +208,7 @@ class Player(Entity):
         elif case_proper == "All" and self.loc.ground:
             for item in self.loc.ground:
                 self.inv.append(item)
-            
+
             self.loc.ground = []
 
             self.loc.location()
@@ -259,8 +277,8 @@ class Mob(Entity):
     def __init__(self, name, desc, loc,
                  inv, coin, weapon, armour):
         Entity.__init__(self, name, loc, inv,
-                        coin, weapon, armour)
-        self.desc = desc
+                        coin, weapon, armour,
+                        desc, None)
 
 
 # Item classes #
@@ -300,10 +318,10 @@ class Armour(Item):
 
 # World tiles
 wTiles = {
-	# Spawn - Control Station
+    # Spawn - Control Station
     'spawn': TravelTile("Control Station",
                         ("This is a control station located fore of "
-                         "the ship. "
+                         "the midship. "
                          "Commands issued by the bridge are relayed "
                          "here via electronic links to the various "
                          "sections of the ships directly. "
@@ -311,83 +329,102 @@ wTiles = {
                          "ceiling and several displays have gone dark, "
                          "though everything else seems to be in good "
                          "physical condition."),
-                        'ctrl_storage', 'ctrl_entrance', 'ctrl_hall1', 
-                        'ctrl_lift_4', None, None, []),
+                        'ctrl_storage', 'ctrl_entrance', 'ctrl_hall1',
+                        'ctrl_lift_4', None, None, [],
+                        [("You awaken to the feeling of blood dripping "
+                          "down your forehead. Your eyes try to follow "
+                          "lines of the floor when you realize that "
+                          "your whole body feels like it's been thrown "
+                          "out of a car. Slowly, you ease your head up "
+                          "to try to gather your senses. The room around "
+                          "you looks a little different than it did before. "
+                          "Dim auxiliary lighting has taken the place of the "
+                          "usual overhead lamps, some of which have fallen "
+                          "out of the ceiling and flail helplessly around "
+                          "in their wires. Chairs, or at least those not "
+                          "bolted down, are scattered around the room.\n\n"
+                          "As you come to, another face hovers over you.")]),
     'ctrl_storage': TravelTile("Bow Storage",
-    						   ("A medium-sized room that lies beyond "
-    						   	"the main controls, capable of storing "
-    						   	"more than a hundred cargo blocks. "
-    						   	"There might be something useful in here, "
-    						   	"but everything has fallen onto the floor. "
-    						   	"You groan at the thought of cleaning "
-    						   	"this up."),
-    						   None, 'spawn', None, None, None, None, 
-    						   ['Broken Electronics', 'PalmPal']),
+                               ("A medium-sized room that lies beyond "
+                                "the main controls, capable of storing "
+                                "more than a hundred cargo blocks. "
+                                "There might be something useful in here, "
+                                "but everything has fallen onto the floor. "
+                                "You groan at the thought of cleaning "
+                                "this up."),
+                               None, 'spawn', None, None, None, None,
+                               ['Broken Electronics', 'PalmPal'], None),
     'ctrl_lift_4': TravelTile("PowerLift",
-    						("A PowerLift is capable of transporting "
-    						 "goods and people to different floors. "
-    						 "The unit is currently unpowered."),
-    						None, None, 'spawn', None, None, None, []),
+                              ("A PowerLift is capable of transporting "
+                               "goods and people to different floors. "
+                               "The unit is currently unpowered."),
+                              None, None, 'spawn', None, None, None, [],
+                              None),
     'ctrl_entrance': TravelTile("Control Station - Entry",
-	                       ("You stand at the entry to the bow control "
-	                        "station. The airtight doors to the room have "
-	                        "jammed themselves open, and it doesn't look "
-	                        "like they'll be operational any time soon.\n\n"
-	                        "To the left is the door to the west wing "
-	                        "of the control station, which includes "
-	                        "the officers' lounge. The door is locked "
-	                        "and requires a keycard to get in."), 
-                        'spawn', None, None, None, None, None, []),
+                                ("You stand at the entry to the bow control "
+                                 "station. The airtight doors to the room have "
+                                 "jammed themselves open, and it doesn't look "
+                                 "like they'll be operational any time soon.\n\n"
+                                 "To the left is the door to the west wing "
+                                 "of the control station, which includes "
+                                 "the officers' lounge. The door is locked "
+                                 "and requires a keycard to get in."),
+                                'spawn', None, None, None, None, None, [],
+                                None),
     'ctrl_hall1': TravelTile("Control Wing - East",
-    						 ("A hallway in the eastern wing of the "
-    						  "control station. Weapons Control lies "
-    						  "to the south."),
-    						 None, 'ctrl_weps', 'ctrl_hall2', 
-    						 'spawn', None, None, []),
+                             ("A hallway in the eastern wing of the "
+                              "control station. Weapons Control lies "
+                              "to the south."),
+                             None, 'ctrl_weps', 'ctrl_hall2',
+                             'spawn', None, None, [], None),
     'ctrl_weps': TravelTile("Weapons Control",
-    						("You stand in the darkened room that "
-    						 "houses the controls for the ship's batteries. "
-    						 "In routine operations the room is lit "
-    						 "only by a few darklights. Now that the "
-    						 "main power is out, only the consoles "
-    						 "are producing any illumination. Weapons "
-    						 "is one of the few systems designated as "
-    						 "essential and thus capable of drawing "
-    						 "auxiliary power in emergencies."),
-    						'ctrl_hall1', None, None, None, None, None, []),
+                            ("You stand in the darkened room that "
+                             "houses the controls for the ship's batteries. "
+                             "In routine operations the room is lit "
+                             "only by a few darklights. Now that the "
+                             "main power is out, only the consoles "
+                             "are producing any illumination. Weapons "
+                             "is one of the few systems designated as "
+                             "essential and thus capable of drawing "
+                             "auxiliary power in emergencies."),
+                            'ctrl_hall1', None, None, None, None, None, [],
+                            None),
     'ctrl_hall2': TravelTile("Control Wing - East",
-    						 ("A hallway in the eastern wing of the "
-    						  "control station. Life Support lies "
-    						  "to the north and Comms are to the south."),
-    						 'ctrl_ls', 'ctrl_comm', None, 
-    						 'ctrl_hall1', None, None, []),
+                             ("A hallway in the eastern wing of the "
+                              "control station. Life Support lies "
+                              "to the north and Comms are to the south."),
+                             'ctrl_ls', 'ctrl_comm', None,
+                             'ctrl_hall1', None, None, [],
+                             None),
     'ctrl_ls': TravelTile("Life Support Control",
-    	                  ("You stand before the various displays "
-    	                   "pulling readings from the different "
-    	                   "sections of the ship. Everything from "
-    	                   "oxygen levels, temperature, atmospheric "
-    	                   "pressure and more is collected and analyzed "
-    	                   "by the ship's AI. You slightly marvel at "
-    	                   "the complexity of the machinery."),
-    	                  None, 'ctrl_hall2', None, None, None, None, []),
+                          ("You stand before the various displays "
+                           "pulling readings from the different "
+                           "sections of the ship. Everything from "
+                           "oxygen levels, temperature, atmospheric "
+                           "pressure and more is collected and analyzed "
+                           "by the ship's AI. You slightly marvel at "
+                           "the complexity of the machinery."),
+                          None, 'ctrl_hall2', None, None, None, None, [],
+                          None),
     'ctrl_comm': TravelTile("Communications Control",
-    						("The communications hub hasn't sustained "
-    					     "much damage at all. A few upturned cups "
-    					     "of coffee stain the workstations but other "
-    					     "than that it's as if the room had been "
-    					     "untouched."),
-    						'ctrl_hall2', None, None, None, None, None, [])
+                            ("The communications hub hasn't sustained "
+                             "much damage at all. A few upturned cups "
+                             "of coffee stain the workstations but other "
+                             "than that it's as if the room had been "
+                             "untouched."),
+                            'ctrl_hall2', None, None, None, None, None, [],
+                            None)
 }
 
 # Entity instances
 player = Player("Test")
 wNPC = {
-    
+
 }
 
 # Item instances
 wItems = {
-    
+
 }
 
 
@@ -448,20 +485,20 @@ class InputCmd(cmd.Cmd):
     def help_general(self):
         cls()
 
-        help_msg = ("Welcome to the Python Text Adventure. "
-                    "The aim of the game is to explore the "
-                    "world and interact with the different "
+        help_msg = ("Welcome to the game. The aim is to explore "
+                    "the world and interact with the different "
                     "entities within. For help at any time, "
                     "enter HELP [?] to list help topics or "
                     "type \"HELP <topic>\" to get specific "
-                    "information on a topic. You can QUIT [Q] "
-                    "the game at any time.")
+                    "information on a topic. Type all commands "
+                    "in lowercase. You can QUIT [Q] the game at "
+                    "any time.")
 
         print("=" * 7)
         print("GENERAL")
         print("=" * 7)
         print("")
-        print("\n".join(textwrap.wrap(help_msg, SCREEN_WIDTH)))
+        print(wrapStr(help_msg))
 
     def help_movement(self):
         cls()
@@ -476,7 +513,7 @@ class InputCmd(cmd.Cmd):
         print("MOVEMENT")
         print("=" * 8)
         print("")
-        print("\n".join(textwrap.wrap(help_msg, SCREEN_WIDTH)))
+        print(wrapStr(help_msg))
 
     def help_interaction(self):
         cls()
@@ -495,7 +532,7 @@ class InputCmd(cmd.Cmd):
         print("INTERACTION")
         print("=" * 11)
         print("")
-        print("\n".join(textwrap.wrap(help_msg, SCREEN_WIDTH)))
+        print(wrapStr(help_msg))
 
     # Invalid command message
     def default(self, arg):
@@ -510,7 +547,7 @@ class InputCmd(cmd.Cmd):
         print("INVALID COMMAND")
         print("=" * 15)
         print("")
-        print("\n".join(textwrap.wrap(error_msg, SCREEN_WIDTH)))
+        print(wrapStr(error_msg))
 
     # Aliases
     do_q = do_quit
@@ -524,16 +561,32 @@ class InputCmd(cmd.Cmd):
 
 
 # Utility functions
+def wrapStr(string):
+    """Textwraps a string using SCREEN and joins with newlines"""
+    return "\n".join(textwrap.wrap(string, SCREEN_WIDTH))
+
+
 def cls():
     """Clears the screen."""
     os.system("cls" if os.name == "nt" else "clear")
 
+
 # Input loop
 if __name__ == '__main__':
     cls()
-    print("Python Text Adventure\n"
-          "====================\n\n"
-          "Press any key to begin.\n")
+    print(__title__)
+    print("=" * len(__title__))
+    print("")
+    welcome_msg = ("Welcome to the game. The aim is to explore "
+                   "the world and interact with the different "
+                   "entities within. For help at any time, "
+                   "enter HELP [?] to list help topics or "
+                   "type \"HELP <topic>\" to get specific "
+                   "information on a topic. Type all commands "
+                   "in lowercase. You can QUIT [Q] the game at "
+                   "any time.")
+    print(wrapStr(welcome_msg))
+    print("\nPress ENTER to continue.\n")
     raw_input("> ")
     cls()
 
