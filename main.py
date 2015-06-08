@@ -102,9 +102,9 @@ class NPCTile(TravelTile):
                  south, east, west, up,
                  down, ground, npc,
                  on_first_visit):
-        TravelTile.__init__(name, desc, north, south,
+        TravelTile.__init__(self, name, desc, north, south,
                             east, west, up, down, ground,
-                            False, on_first_visit)
+                            on_first_visit)
         self.npc = npc
 
     def location(self):
@@ -132,6 +132,14 @@ class NPCTile(TravelTile):
 
         wrapStr(self.desc)
         print("")
+
+        if self.npc:
+            print("People in this area:")
+
+            for person in self.npc:
+                print(wNPC[person].name)
+
+            print("")
 
         if self.ground:
             print("Items on the ground:")
@@ -438,7 +446,7 @@ class Armour(Item):
 # World tiles
 wTiles = {
     # Spawn - Control Station
-    'spawn': TravelTile("Control Station",
+    'spawn': NPCTile("Control Station",
                         ("This is a control station located fore of "
                          "the midship. "
                          "Commands issued by the bridge are relayed "
@@ -449,7 +457,7 @@ wTiles = {
                          "though everything else seems to be in good "
                          "physical condition."),
                         'ctrl_storage', 'ctrl_entrance', 'ctrl_hall1',
-                        'ctrl_lift_4', None, None, {},
+                        'ctrl_lift_4', None, None, {}, ['lt_nates'],
                         [("You awaken to the feeling of blood dripping "
                           "down your forehead. Your eyes try to follow "
                           "lines of the floor when you realize that "
