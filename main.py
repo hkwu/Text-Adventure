@@ -68,7 +68,10 @@ class TravelTile(object):
             print("Items on the ground:")
 
             for item in self.ground:
-                print(item)
+                if wItems[item] > 1:
+                    print(wItems[item].name + " (%d)" % self.ground[item])
+                else:
+                    print(wItems[item].name)
         else:
             print("There are no items on the ground.")
 
@@ -104,8 +107,63 @@ class NPCTile(TravelTile):
                             False, on_first_visit)
         self.npc = npc
 
-    def talk(self, npc):
-        pass
+    def location(self):
+        """
+        Prints location information and sets visited status
+        to True
+        """
+        cls()
+
+        if not self.visited and self.on_first_visit:
+            self.visited = True
+
+            for paragraph in self.on_first_visit:
+                cls()
+                wrapStr(paragraph)
+                print("\nPress ENTER to continue.\n")
+                dialoguePrompt()
+
+        cls()
+        border_len = len(self.name)
+
+        print(":" * border_len)
+        print(self.name)
+        print(":" * border_len + "\n")
+
+        wrapStr(self.desc)
+        print("")
+
+        if self.ground:
+            print("Items on the ground:")
+
+            # Printing item count if there are multiple copies
+            for item in self.ground:
+                if wItems[item] > 1:
+                    print(wItems[item].name + " (%d)" % wItems[item])
+                else:
+                    print(wItems[item].name)
+        else:
+            print("There are no items on the ground.")
+
+        print("")
+
+        if self.north:
+            print("NORTH: %s" % wTiles[self.north].name)
+        if self.south:
+            print("SOUTH: %s" % wTiles[self.south].name)
+        if self.east:
+            print("EAST: %s" % wTiles[self.east].name)
+        if self.west:
+            print("WEST: %s" % wTiles[self.west].name)
+        if self.up:
+            print("UP: %s" % wTiles[self.up].name)
+        if self.down:
+            print("DOWN: %s" % wTiles[self.down].name)
+
+        # events will appear under this border
+        print("")
+        print("~" * 20)
+        print("")
 
 
 # Entity classes #
@@ -113,12 +171,12 @@ class NPCTile(TravelTile):
 # Base entity
 class Entity(object):
     def __init__(self, name, loc, inv,
-                 coin, weapon, armour,
+                 credits, weapon, armour,
                  desc, gender):
         self.name = name
         self.loc = loc
         self.inv = inv
-        self.coin = coin
+        self.credits = credits
         self.weapon = weapon
         self.armour = armour
         self.desc = desc
@@ -150,7 +208,7 @@ class Player(Entity):
     hp = 100
 
     def __init__(self, name):
-        Entity.__init__(self, name, wTiles['spawn'], [],
+        Entity.__init__(self, name, wTiles['spawn'], {},
                         50, None, None, None, None)
 
     def get_inv(self):
@@ -161,7 +219,10 @@ class Player(Entity):
             print("Inventory:")
 
             for item in self.inv:
-                print(item)
+                if self.inv[item] > 1:
+                    print(wItems[item].name + " (%d)" % self.inv[item])
+                else:
+                    print(wItems[item].name)
         else:
             print("Your inventory is empty.")
 
@@ -201,9 +262,12 @@ class Player(Entity):
             print("What are you trying to take?")
         elif case_proper == "All" and self.loc.ground:
             for item in self.loc.ground:
-                self.inv.append(item)
+                if item in self.inv:
+                    self.inv[item] += self.loc.ground[item]
+                else:
+                    self.inv[item] = self.loc.ground[item]
 
-            self.loc.ground = []
+            self.loc.ground = {}
 
             self.loc.location()
             print("You take everything.")
@@ -211,8 +275,17 @@ class Player(Entity):
             self.loc.location()
             print("There is nothing to take.")
         elif case_proper in self.loc.ground:
-            self.loc.ground.remove(case_proper)
-            self.inv.append(case_proper)
+            # Decrease item count if multiple copies exist,
+            # remove item altogether if only one copy
+            if self.loc.ground[case_proper] > 1:
+                self.loc.ground[case_proper] -= 1
+            else:
+                self.loc.ground.pop(case_proper)
+
+            if case_proper in self.inv:
+                self.inv[case_proper] += 1
+            else:
+                self.inv[case_proper] = 1
 
             self.loc.location()
             print("You take the %s." % case_proper)
@@ -230,9 +303,12 @@ class Player(Entity):
             print("What are you trying to drop?")
         elif case_proper == "All" and self.inv:
             for item in self.inv:
-                self.loc.ground.append(item)
+                if item in self.loc.ground:
+                    self.loc.ground[item] += self.inv[item]
+                else:
+                    self.loc.ground[item] = self.inv[item]
 
-            self.inv = []
+            self.inv = {}
 
             self.loc.location()
             print("You drop everything on the ground.")
@@ -240,8 +316,15 @@ class Player(Entity):
             self.loc.location()
             print("You have nothing to drop.")
         elif case_proper in self.inv:
-            self.inv.remove(case_proper)
-            self.loc.ground.append(case_proper)
+            if self.inv[case_proper] > 1:
+                self.inv[case_proper] -= 1
+            else:
+                self.inv.pop(case_proper)
+
+            if case_proper in self.loc.ground:
+                self.loc.ground[case_proper] += 1
+            else:
+                self.loc.ground[case_proper] = 1
 
             self.loc.location()
             print("You throw the %s on the ground." % case_proper)
@@ -253,23 +336,51 @@ class Player(Entity):
 # NPC entities
 class NPC(Entity):
     def __init__(self, name, gender, desc,
-                 loc, inv, coin, weapon,
-                 armour, lines):
+                 loc, inv, credits, weapon,
+                 armour, lines, merchant):
         Entity.__init__(self, name, loc, inv,
-                        coin, weapon, armour, desc,
+                        credits, weapon, armour, desc,
                         gender)
         self.lines = lines
+        self.merchant = merchant
+
+    def talk(self):
+        """Engages dialogue with NPC"""
+        pass
+
+    def shop(self):
+        """Prints out the merchant's inventory"""
+        if self.merchant and self.inv:
+            print("Merchant's Inventory:")
+
+            for item in self.inv:
+                print(wItems[item].name)
+        else:
+            print("%s has nothing to sell!" % self.name)
 
     def purchase(self, item):
-        pass
+        """Purchases item from merchant"""
+        if self.merchant:
+            pass
+        else:
+            player.loc.location()
+            print("You can't buy anything from %s." % self.name)
+
+    def sell(self, item):
+        """Sells item to the merchant"""
+        if self.merchant:
+            pass
+        else:
+            player.loc.location()
+            print("You can't sell anything to %s." % self.name)
 
 
 # Mobs
 class Mob(Entity):
     def __init__(self, name, desc, loc,
-                 inv, coin, weapon, armour):
+                 inv, credits, weapon, armour):
         Entity.__init__(self, name, loc, inv,
-                        coin, weapon, armour,
+                        credits, weapon, armour,
                         desc, None)
 
 
@@ -277,32 +388,48 @@ class Mob(Entity):
 
 # Base item
 class Item(object):
-    def __init__(self, name, desc, price):
+    def __init__(self, name, desc, price, stackable):
         self.name = name
         self.desc = desc
         self.price = price
+        self.stackable = stackable
 
     def examine(self):
         cls()
         player.loc.location()
 
         print("You examine the %s.\n" % self.name)
-        print(self.desc + " It is worth %d coins." % self.price)
+        print(self.desc + " It is worth %d credits." % self.price)
 
 
 # Weapons
 class Weapon(Item):
+    is_firearm = False
+
     def __init__(self, name, desc, price,
                  damage):
-        Item.__init__(name, desc, price)
+        Item.__init__(self, name, desc, price, False)
         self.damage = damage
+
+
+class Ammunition(Item):
+    def __init__(self, name, desc, price):
+        Item.__init__(self, name, desc, price, True)
+
+
+class Firearm(Weapon):
+    def __init__(self, name, desc, price,
+                 damage, ammo):
+        Weapon.__init__(self, name, desc, price, damage)
+        self.ammo = ammo
+        self.is_firearm = True
 
 
 # Armour
 class Armour(Item):
     def __init__(self, name, desc, price,
                  defence):
-        Item.__init__(name, desc, price)
+        Item.__init__(self, name, desc, price, False)
         self.defence = defence
 
 
@@ -322,7 +449,7 @@ wTiles = {
                          "though everything else seems to be in good "
                          "physical condition."),
                         'ctrl_storage', 'ctrl_entrance', 'ctrl_hall1',
-                        'ctrl_lift_4', None, None, [],
+                        'ctrl_lift_4', None, None, {},
                         [("You awaken to the feeling of blood dripping "
                           "down your forehead. Your eyes try to follow "
                           "lines of the floor when you realize that "
@@ -370,12 +497,12 @@ wTiles = {
                                 "You groan at the thought of cleaning "
                                 "this up."),
                                None, 'spawn', None, None, None, None,
-                               ['Broken Electronics', 'PalmPal'], None),
+                               {'off_pistol': 3, 'Test': 10}, None),
     'ctrl_lift_4': TravelTile("PowerLift",
                               ("A PowerLift is capable of transporting "
                                "goods and people to different floors. "
                                "The unit is currently unpowered."),
-                              None, None, 'spawn', None, None, None, [],
+                              None, None, 'spawn', None, None, None, {},
                               None),
     'ctrl_entrance': TravelTile("Control Station - Entry",
                                 ("You stand at the entry to the bow control "
@@ -387,14 +514,14 @@ wTiles = {
                                  "of the control station, which includes "
                                  "the officers' lounge. The door is locked "
                                  "and requires a keycard to get in."),
-                                'spawn', None, None, None, None, None, [],
+                                'spawn', None, None, None, None, None, {},
                                 None),
     'ctrl_hall1': TravelTile("Control Wing - East",
                              ("A hallway in the eastern wing of the "
                               "control station. Weapons Control lies "
                               "to the south."),
                              None, 'ctrl_weps', 'ctrl_hall2',
-                             'spawn', None, None, [], None),
+                             'spawn', None, None, {}, None),
     'ctrl_weps': TravelTile("Weapons Control",
                             ("You stand in the darkened room that "
                              "houses the controls for the ship's batteries. "
@@ -405,14 +532,14 @@ wTiles = {
                              "is one of the few systems designated as "
                              "essential and thus capable of drawing "
                              "auxiliary power in emergencies."),
-                            'ctrl_hall1', None, None, None, None, None, [],
+                            'ctrl_hall1', None, None, None, None, None, {},
                             None),
     'ctrl_hall2': TravelTile("Control Wing - East",
                              ("A hallway in the eastern wing of the "
                               "control station. Life Support lies "
                               "to the north and Comms are to the south."),
                              'ctrl_ls', 'ctrl_comm', None,
-                             'ctrl_hall1', None, None, [],
+                             'ctrl_hall1', None, None, {},
                              None),
     'ctrl_ls': TravelTile("Life Support Control",
                           ("You stand before the various displays "
@@ -422,7 +549,7 @@ wTiles = {
                            "pressure and more is collected and analyzed "
                            "by the ship's AI. You slightly marvel at "
                            "the complexity of the machinery."),
-                          None, 'ctrl_hall2', None, None, None, None, [],
+                          None, 'ctrl_hall2', None, None, None, None, {},
                           None),
     'ctrl_comm': TravelTile("Communications Control",
                             ("The communications hub hasn't sustained "
@@ -430,19 +557,41 @@ wTiles = {
                              "of coffee stain the workstations but other "
                              "than that it's as if the room had been "
                              "untouched."),
-                            'ctrl_hall2', None, None, None, None, None, [],
+                            'ctrl_hall2', None, None, None, None, None, {},
                             None)
 }
 
 # Entity instances
 player = Player("Test")
 wNPC = {
-
+    'lt_nates': NPC("Lt. Nates", "F",
+                    ("She gives you an annoyed look when you stare "
+                     "in her direction."), 'spawn',
+                    {'off_uniform': 1, 'off_pistol': 1},
+                    100, ['off_pistol'], 'off_uniform', {}, False)
 }
 
 # Item instances
 wItems = {
-
+    'Test': Item("Test", "Test", 1, True),
+    # Weapons
+    'off_pistol': Firearm("Officer's Pistol",
+                          ("The standard issue officer's pistol, "
+                           "constructed from a hardened CarboSteel "
+                           "body that's guaranteed to be sleek and "
+                           "functional."), 50, 15, 'Gauss Pellet'),
+    # Ammunition
+    'Gauss Pellet': Ammunition("Gauss Pellet",
+                               ("A common projectile found in many of the "
+                                "Air Force's off-world combat equipment. "
+                                "The pellet is shaped to induce maximum "
+                                "penetration at longer distances than "
+                                "conventional projectiles."), 1),
+    # Armour
+    'off_uniform': Armour("Officer's Uniform",
+                          ("A dark blue uniform issued to the officers "
+                           "in the Air Force. It comes with leather boots "
+                           "and a custom colour sash."), 25, 10)
 }
 
 
@@ -602,12 +751,12 @@ def wrapStr(string):
 
 
 def cls():
-    """Clears the screen."""
+    """Clears the screen"""
     os.system("cls" if os.name == "nt" else "clear")
 
 
 def dialoguePrompt():
-    """Special prompt for dialogue sequences that allows quitting."""
+    """Special prompt for dialogue sequences that allows quitting"""
     choice = raw_input("> ")
     if choice.lower() == "q" or choice.lower() == "quit":
         cls()
