@@ -147,7 +147,7 @@ class NPCTile(TravelTile):
             # Printing item count if there are multiple copies
             for item in self.ground:
                 if wItems[item] > 1:
-                    print(wItems[item].name + " (%d)" % wItems[item])
+                    print(wItems[item].name + " (%d)" % self.ground[item])
                 else:
                     print(wItems[item].name)
         else:
