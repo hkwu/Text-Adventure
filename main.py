@@ -1,6 +1,6 @@
 #! python3
 
-__title__ = "Python Space Adventure (real name pending)"
+__title__ = "Python Fantasy Adventure (real name pending)"
 
 # by Kelvin Wu
 # initial commit 2015-06-01
@@ -446,160 +446,28 @@ class Armour(Item):
 # World tiles
 wTiles = {
     # Spawn - Control Station
-    'spawn': NPCTile("Control Station",
-                        ("This is a control station located fore of "
-                         "the midship. "
-                         "Commands issued by the bridge are relayed "
-                         "here via electronic links to the various "
-                         "sections of the ships directly. "
-                         "Wires and panels now hang loose from the "
-                         "ceiling and several displays have gone dark, "
-                         "though everything else seems to be in good "
-                         "physical condition."),
-                        'ctrl_storage', 'ctrl_entrance', 'ctrl_hall1',
-                        'ctrl_lift_4', None, None, {}, ['lt_nates'],
-                        [("You awaken to the feeling of blood dripping "
-                          "down your forehead. Your eyes try to follow "
-                          "lines of the floor when you realize that "
-                          "your whole body feels like it's been thrown "
-                          "out of a car. Slowly, you ease your head up "
-                          "to try to gather your senses. The room around "
-                          "you looks a little different than it did before. "
-                          "Dim auxiliary lighting has taken the place of the "
-                          "usual overhead lamps, some of which have fallen "
-                          "out of the ceiling and flail around helplessly "
-                          "in their wires. Chairs, or at least those not "
-                          "bolted down, are scattered around the room.\n"
-                          "As you come to, a fuzzy face hovers over you."),
-                         ("Stranger: \"Are you awake? Take your time. "
-                          "We had quite a landing.\""),
-                         ("You ease yourself up against the wall. The "
-                          "unfamiliar face begins to sharpen and you "
-                          "manage to catch a glimpse of the name on "
-                          "her uniform."),
-                         ("Lt. Nates: \"What happened? Don't know. Hit "
-                          "some kind of trouble in the atmosphere. I "
-                          "know about as much as you. The ship got dragged "
-                          "down pretty quick. I've never seen anything like "
-                          "it. I overheard a couple of techs over IntraNet; "
-                          "they were saying something about a gravitational "
-                          "anomaly, but that's not really my expertise.\"\n"
-                          "Lt. Nates' eyes drift to your forehead.\n"
-                          "Lt. Nates: \"Hey, if you feel like you're up "
-                          "for it, would you mind heading to the bridge "
-                          "and asking around a bit? Figure out what's "
-                          "going on? I've got to stick around here and "
-                          "manage this mess. You can stop by the MedBay "
-                          "while you're at it.\"\n"
-                          "She glances over her shoulder.\n"
-                          "Lt. Nates: \"Oh, and I should probably mention "
-                          "that the PowerLift over there is down, so you'll "
-                          "need to find another way to get to the other "
-                          "floors. Best of luck!\"")]),
-    'ctrl_storage': TravelTile("Bow Storage",
-                               ("A medium-sized room that lies beyond "
-                                "the main controls, capable of storing "
-                                "more than a hundred cargo blocks. "
-                                "There might be something useful in here, "
-                                "but everything has fallen onto the floor. "
-                                "You groan at the thought of cleaning "
-                                "this up."),
-                               None, 'spawn', None, None, None, None,
-                               {'off_pistol': 3, 'Test': 10}, None),
-    'ctrl_lift_4': TravelTile("PowerLift",
-                              ("A PowerLift is capable of transporting "
-                               "goods and people to different floors. "
-                               "The unit is currently unpowered."),
-                              None, None, 'spawn', None, None, None, {},
-                              None),
-    'ctrl_entrance': TravelTile("Control Station - Entry",
-                                ("You stand at the entry to the bow control "
-                                 "station. The airtight doors to the room "
-                                 "have jammed themselves open, and it doesn't "
-                                 "look like they'll be operational any time "
-                                 "soon."
-                                 "To the left is the door to the west wing "
-                                 "of the control station, which includes "
-                                 "the officers' lounge. The door is locked "
-                                 "and requires a keycard to get in."),
-                                'spawn', None, None, None, None, None, {},
-                                None),
-    'ctrl_hall1': TravelTile("Control Wing - East",
-                             ("A hallway in the eastern wing of the "
-                              "control station. Weapons Control lies "
-                              "to the south."),
-                             None, 'ctrl_weps', 'ctrl_hall2',
-                             'spawn', None, None, {}, None),
-    'ctrl_weps': TravelTile("Weapons Control",
-                            ("You stand in the darkened room that "
-                             "houses the controls for the ship's batteries. "
-                             "In routine operations the room is lit "
-                             "only by a few darklights. Now that the "
-                             "main power is out, only the consoles "
-                             "are producing any illumination. Weapons "
-                             "is one of the few systems designated as "
-                             "essential and thus capable of drawing "
-                             "auxiliary power in emergencies."),
-                            'ctrl_hall1', None, None, None, None, None, {},
-                            None),
-    'ctrl_hall2': TravelTile("Control Wing - East",
-                             ("A hallway in the eastern wing of the "
-                              "control station. Life Support lies "
-                              "to the north and Comms are to the south."),
-                             'ctrl_ls', 'ctrl_comm', None,
-                             'ctrl_hall1', None, None, {},
-                             None),
-    'ctrl_ls': TravelTile("Life Support Control",
-                          ("You stand before the various displays "
-                           "pulling readings from the different "
-                           "sections of the ship. Everything from "
-                           "oxygen levels, temperature, atmospheric "
-                           "pressure and more is collected and analyzed "
-                           "by the ship's AI. You slightly marvel at "
-                           "the complexity of the machinery."),
-                          None, 'ctrl_hall2', None, None, None, None, {},
-                          None),
-    'ctrl_comm': TravelTile("Communications Control",
-                            ("The communications hub hasn't sustained "
-                             "much damage at all. A few upturned cups "
-                             "of coffee stain the workstations but other "
-                             "than that it's as if the room had been "
-                             "untouched."),
-                            'ctrl_hall2', None, None, None, None, None, {},
-                            None)
+    'spawn': TravelTile("Forest Path",
+                        ("A path in the forest. It looks like every "
+                         "other one that you've walked so far."),
+                        'f_path0', None, None, None, None, None, {},
+                        [("After a long day of hiking, your feet give "
+                          "out under you. You stop to rest under the "
+                          "nearest tree and watch the birds fly over "
+                          "for a while.")]),
+    'f_path0': TravelTile("Forest Path",
+                          ("A path in the forest."),
+                          None, 'spawn', None, None, None, None, {}, None)
 }
 
 # Entity instances
 player = Player("Test")
 wNPC = {
-    'lt_nates': NPC("Lt. Nates", "F",
-                    ("She gives you an annoyed look when you stare "
-                     "in her direction."), 'spawn',
-                    {'off_uniform': 1, 'off_pistol': 1},
-                    100, ['off_pistol'], 'off_uniform', {}, False)
+
 }
 
 # Item instances
 wItems = {
-    'Test': Item("Test", "Test", 1, True),
-    # Weapons
-    'off_pistol': Firearm("Officer's Pistol",
-                          ("The standard issue officer's pistol, "
-                           "constructed from a hardened CarboSteel "
-                           "body that's guaranteed to be sleek and "
-                           "functional."), 50, 15, 'Gauss Pellet'),
-    # Ammunition
-    'Gauss Pellet': Ammunition("Gauss Pellet",
-                               ("A common projectile found in many of the "
-                                "Air Force's off-world combat equipment. "
-                                "The pellet is shaped to induce maximum "
-                                "penetration at longer distances than "
-                                "conventional projectiles."), 1),
-    # Armour
-    'off_uniform': Armour("Officer's Uniform",
-                          ("A dark blue uniform issued to the officers "
-                           "in the Air Force. It comes with leather boots "
-                           "and a custom colour sash."), 25, 10)
+
 }
 
 
