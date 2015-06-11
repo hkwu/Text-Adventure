@@ -19,26 +19,6 @@ class Entity(object):
         self.desc = desc
         self.gender = gender
 
-    def examine(self):
-        """Examines the entity."""
-        utils.cls()
-        self.loc.location()
-
-        print("You look at %s.\n" % self.name)
-
-        examining = ""
-
-        if self.gender == "M":
-            examining += "He"
-        elif self.gender == "F":
-            examining += "She"
-        else:
-            examining += "It"
-
-        examining += " is wearing a %s and wields a %s." % (self.armour,
-                                                            self.weapon)
-        print(examining)
-
 
 # Player entity with additional traits
 class Player(Entity):
@@ -50,7 +30,7 @@ class Player(Entity):
 
     def get_inv(self):
         """Print player's inventory"""
-        utils.cls()
+        # utils.cls()
 
         if self.inv:
             print("Inventory:")
@@ -65,7 +45,7 @@ class Player(Entity):
 
     def move(self, direction):
         """Moves player in direction"""
-        utils.cls()
+        # utils.cls()
 
         if direction == "north" and self.loc.north:
             self.loc = data.wTiles[self.loc.north]
@@ -93,28 +73,19 @@ class Player(Entity):
     def take(self, item):
         """Moves pickable item to player's inventory"""
         case_proper = string.capwords(item)
-        utils.cls()
+        # utils.cls()
 
         if not item:
-            self.loc.location()
+            # self.loc.location()
             print("What are you trying to take?")
-        elif case_proper == "All" and self.loc.ground:
-            for item in self.loc.ground:
-                if data.wItems[item].pickable and item in self.inv:
-                    self.inv[item] += self.loc.ground[item]
-                elif data.wItems[item].pickable:
-                    self.inv[item] = self.loc.ground[item]
-
-            self.loc.ground = {}
-
-            self.loc.location()
-            print("You take everything.")
-        elif case_proper == "All":
-            self.loc.location()
-            print("There is nothing to take.")
         elif case_proper in self.loc.ground:
             # Decrease item count if multiple copies exist,
             # remove item altogether if only one copy
+            if not data.wItems[case_proper].pickable:
+                print("You can't take that!")
+
+                return
+
             if self.loc.ground[case_proper] > 1:
                 self.loc.ground[case_proper] -= 1
             else:
@@ -125,34 +96,37 @@ class Player(Entity):
             else:
                 self.inv[case_proper] = 1
 
-            self.loc.location()
+            # self.loc.location()
             print("You take the %s." % case_proper)
         else:
-            self.loc.location()
+            # self.loc.location()
             print("That's not even on the ground.")
 
+    def take_all(self):
+        """Moves all pickable items to player's inventory"""
+        if self.loc.ground:
+            for item in self.loc.ground:
+                if data.wItems[item].pickable and item in self.inv:
+                    self.inv[item] += self.loc.ground[item]
+                    self.loc.ground.pop(item)
+                elif data.wItems[item].pickable:
+                    self.inv[item] = self.loc.ground[item]
+                    self.loc.ground.pop(item)
+
+            # self.loc.location()
+            print("You take everything you can.")
+        else:
+            # self.loc.location()
+            print("There is nothing to take.")
+
     def drop(self, item):
-        """Moves item to the ground"""
+        """Moves item in player's inventory to the ground"""
         case_proper = string.capwords(item)
-        utils.cls()
+        # utils.cls()
 
         if not item:
-            self.loc.location()
+            # self.loc.location()
             print("What are you trying to drop?")
-        elif case_proper == "All" and self.inv:
-            for item in self.inv:
-                if item in self.loc.ground:
-                    self.loc.ground[item] += self.inv[item]
-                else:
-                    self.loc.ground[item] = self.inv[item]
-
-            self.inv = {}
-
-            self.loc.location()
-            print("You drop everything on the ground.")
-        elif case_proper == "All":
-            self.loc.location()
-            print("You have nothing to drop.")
         elif case_proper in self.inv:
             if self.inv[case_proper] > 1:
                 self.inv[case_proper] -= 1
@@ -164,11 +138,28 @@ class Player(Entity):
             else:
                 self.loc.ground[case_proper] = 1
 
-            self.loc.location()
+            # self.loc.location()
             print("You throw the %s on the ground." % case_proper)
         else:
-            self.loc.location()
+            # self.loc.location()
             print("You don't even have one of those.")
+
+    def drop_all(self):
+        """Moves all items in player's inventory to the ground"""
+        if self.inv:
+            for item in self.inv:
+                if item in self.loc.ground:
+                    self.loc.ground[item] += self.inv[item]
+                else:
+                    self.loc.ground[item] = self.inv[item]
+
+            self.inv = {}
+
+            # self.loc.location()
+            print("You drop everything on the ground.")
+        else:
+            # self.loc.location()
+            print("You have nothing to drop.")
 
     def examine_item(self, item):
         """Examines an item on the ground."""

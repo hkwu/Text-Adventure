@@ -27,7 +27,7 @@ class TravelTile(object):
         Prints location information and sets visited status
         to True
         """
-        utils.cls()
+        # utils.cls()
 
         if not self.visited and self.on_first_visit:
             self.visited = True
@@ -38,7 +38,7 @@ class TravelTile(object):
                 print("\nPress ENTER to continue.\n")
                 utils.dialogue_prompt()
 
-        utils.cls()
+        # utils.cls()
         border_len = len(self.name)
 
         print(":" * border_len)
@@ -75,9 +75,9 @@ class TravelTile(object):
             print("DOWN: %s" % data.wTiles[self.down].name)
 
         # events will appear under this border
-        print("")
-        print("~" * 20)
-        print("")
+        # print("")
+        # print("~" * 20)
+        # print("")
 
 
 # NPC tiles
@@ -96,7 +96,7 @@ class NPCTile(TravelTile):
         Prints location information and sets visited status
         to True
         """
-        utils.cls()
+        # utils.cls()
 
         if not self.visited and self.on_first_visit:
             self.visited = True
@@ -107,7 +107,7 @@ class NPCTile(TravelTile):
                 print("\nPress ENTER to continue.\n")
                 utils.dialogue_prompt()
 
-        utils.cls()
+        # utils.cls()
         border_len = len(self.name)
 
         print(":" * border_len)

@@ -61,11 +61,17 @@ class InputCmd(cmd.Cmd):
     # Interaction functions
     def do_take(self, arg):
         """Pick up an item."""
-        player.take(arg)
+        if arg.lower() == "all":
+            player.take_all()
+        else:
+            player.take(arg)
 
     def do_drop(self, arg):
         """Drop an item."""
-        player.drop(arg)
+        if arg.lower() == "all":
+            player.drop_all()
+        else:
+            player.drop(arg)
 
     def do_examine(self, arg):
         """Examine a person or item."""
@@ -73,7 +79,7 @@ class InputCmd(cmd.Cmd):
 
     # Help topics
     def help_general(self):
-        utils.cls()
+        # utils.cls()
 
         help_msg = ("Welcome to the game. The aim is to explore "
                     "the world and interact with the different "
@@ -91,7 +97,7 @@ class InputCmd(cmd.Cmd):
         utils.wrap_str(help_msg)
 
     def help_movement(self):
-        utils.cls()
+        # utils.cls()
 
         help_msg = ("You can move to the NORTH [N], SOUTH [S], "
                     "EAST [E] and WEST [W] in addition to going "
@@ -106,7 +112,7 @@ class InputCmd(cmd.Cmd):
         utils.wrap_str(help_msg)
 
     def help_interaction(self):
-        utils.cls()
+        # utils.cls()
 
         help_msg = ("There are different ways to interact with "
                     "the game environment. If you see something "
@@ -126,7 +132,7 @@ class InputCmd(cmd.Cmd):
 
     # Invalid command message
     def default(self, arg):
-        utils.cls()
+        # utils.cls()
 
         error_msg = ("That is not a valid command. "
                      "Please try again. "
