@@ -14,7 +14,7 @@ wTiles = {
                                 "nearest tree and watch the birds fly over "
                                 "for a while.")]),
     'f_path0': tiles.TravelTile("Forest Path",
-                                ("A path in the forest."),
+                                "A path in the forest.",
                                 None, 'spawn', None, None, None, None, {}, None)
 }
 

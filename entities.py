@@ -1,3 +1,8 @@
+import data
+import string
+import utils
+
+
 # Entity classes #
 
 # Base entity
@@ -16,7 +21,7 @@ class Entity(object):
 
     def examine(self):
         """Examines the entity."""
-        cls()
+        utils.cls()
         self.loc.location()
 
         print("You look at %s.\n" % self.name)
@@ -40,45 +45,45 @@ class Player(Entity):
     hp = 100
 
     def __init__(self, name):
-        Entity.__init__(self, name, wTiles['spawn'], {},
+        Entity.__init__(self, name, data.wTiles['spawn'], {},
                         50, None, None, None, None)
 
     def get_inv(self):
         """Print player's inventory"""
-        cls()
+        utils.cls()
 
         if self.inv:
             print("Inventory:")
 
             for item in self.inv:
                 if self.inv[item] > 1:
-                    print(wItems[item].name + " (%d)" % self.inv[item])
+                    print(data.wItems[item].name + " (%d)" % self.inv[item])
                 else:
-                    print(wItems[item].name)
+                    print(data.wItems[item].name)
         else:
             print("Your inventory is empty.")
 
     def move(self, direction):
         """Moves player in direction"""
-        cls()
+        utils.cls()
 
         if direction == "north" and self.loc.north:
-            self.loc = wTiles[self.loc.north]
+            self.loc = data.wTiles[self.loc.north]
             self.loc.location()
         elif direction == "south" and self.loc.south:
-            self.loc = wTiles[self.loc.south]
+            self.loc = data.wTiles[self.loc.south]
             self.loc.location()
         elif direction == "east" and self.loc.east:
-            self.loc = wTiles[self.loc.east]
+            self.loc = data.wTiles[self.loc.east]
             self.loc.location()
         elif direction == "west" and self.loc.west:
-            self.loc = wTiles[self.loc.west]
+            self.loc = data.wTiles[self.loc.west]
             self.loc.location()
         elif direction == "up" and self.loc.up:
-            self.loc = wTiles[self.loc.up]
+            self.loc = data.wTiles[self.loc.up]
             self.loc.location()
         elif direction == "down" and self.loc.down:
-            self.loc = wTiles[self.loc.down]
+            self.loc = data.wTiles[self.loc.down]
             self.loc.location()
         else:
             self.loc.location()
@@ -87,7 +92,7 @@ class Player(Entity):
     def take(self, item):
         """Moves pickable item to player's inventory"""
         case_proper = string.capwords(item)
-        cls()
+        utils.cls()
 
         if not item:
             self.loc.location()
@@ -128,7 +133,7 @@ class Player(Entity):
     def drop(self, item):
         """Moves item to the ground"""
         case_proper = string.capwords(item)
-        cls()
+        utils.cls()
 
         if not item:
             self.loc.location()
@@ -186,7 +191,7 @@ class NPC(Entity):
             print("Merchant's Inventory:")
 
             for item in self.inv:
-                print(wItems[item].name)
+                print(data.wItems[item].name)
         else:
             print("%s has nothing to sell!" % self.name)
 

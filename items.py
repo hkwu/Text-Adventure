@@ -1,3 +1,6 @@
+import utils
+
+
 # Item classes #
 
 # Base item
@@ -9,7 +12,7 @@ class Item(object):
         self.stackable = stackable
 
     def examine(self):
-        cls()
+        utils.cls()
         # player.loc.location()
 
         print("You examine the %s.\n" % self.name)

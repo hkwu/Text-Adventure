@@ -16,57 +16,58 @@ import utils
 # Entity instances
 player = entities.Player("Test")
 
+
 # CMD interface class
 class InputCmd(cmd.Cmd):
     prompt = "\n> "
 
     # Interface functions
     def do_quit(self, arg):
-        """\nQuit the game."""
+        """Quit the game."""
         utils.cls()
 
         return True
 
     def do_location(self, arg):
-        """\nWhere am I?"""
+        """Where am I?"""
         player.loc.location()
 
     def do_inventory(self, arg):
-        """\nLists the items in your inventory."""
+        """Lists the items in your inventory."""
         player.get_inv()
 
     # Movement functions
     def do_north(self, arg):
-        """\nGo north."""
+        """Go north."""
         player.move("north")
 
     def do_south(self, arg):
-        """\nGo south."""
+        """Go south."""
         player.move("south")
 
     def do_east(self, arg):
-        """\nGo east."""
+        """Go east."""
         player.move("east")
 
     def do_west(self, arg):
-        """\nGo west."""
+        """Go west."""
         player.move("west")
 
     def do_up(self, arg):
-        """\nGo up."""
+        """Go up."""
         player.move("up")
 
     def do_down(self, arg):
-        """\nGo down."""
+        """Go down."""
         player.move("down")
 
     # Interaction functions
     def do_take(self, arg):
-        """\nPick up an item."""
+        """Pick up an item."""
         player.take(arg)
 
     def do_drop(self, arg):
-        """\nDrop an item."""
+        """Drop an item."""
         player.drop(arg)
 
     # Help topics
@@ -86,7 +87,7 @@ class InputCmd(cmd.Cmd):
         print("GENERAL")
         print("=" * 7)
         print("")
-        utils.wrapStr(help_msg)
+        utils.wrap_str(help_msg)
 
     def help_movement(self):
         utils.cls()
@@ -101,7 +102,7 @@ class InputCmd(cmd.Cmd):
         print("MOVEMENT")
         print("=" * 8)
         print("")
-        utils.wrapStr(help_msg)
+        utils.wrap_str(help_msg)
 
     def help_interaction(self):
         utils.cls()
@@ -120,7 +121,7 @@ class InputCmd(cmd.Cmd):
         print("INTERACTION")
         print("=" * 11)
         print("")
-        utils.wrapStr(help_msg)
+        utils.wrap_str(help_msg)
 
     # Invalid command message
     def default(self, arg):
@@ -135,7 +136,7 @@ class InputCmd(cmd.Cmd):
         print("INVALID COMMAND")
         print("=" * 15)
         print("")
-        utils.wrapStr(error_msg)
+        utils.wrap_str(error_msg)
 
     # Aliases
     do_q = do_quit
@@ -162,9 +163,9 @@ if __name__ == '__main__':
                    "information on a topic. Type all commands "
                    "in lowercase. You can QUIT [Q] the game at "
                    "any time.")
-    utils.wrapStr(welcome_msg)
+    utils.wrap_str(welcome_msg)
     print("")
-    player_name = input("What's your name? ")
+    player_name = raw_input("What's your name? ")
     utils.cls()
 
     player = entities.Player(player_name)

@@ -1,3 +1,7 @@
+import data
+import utils
+
+
 # Tile classes
 
 # Basic tile
@@ -23,25 +27,25 @@ class TravelTile(object):
         Prints location information and sets visited status
         to True
         """
-        cls()
+        utils.cls()
 
         if not self.visited and self.on_first_visit:
             self.visited = True
 
             for paragraph in self.on_first_visit:
-                cls()
-                wrapStr(paragraph)
+                utils.cls()
+                utils.wrap_str(paragraph)
                 print("\nPress ENTER to continue.\n")
-                dialoguePrompt()
+                utils.dialogue_prompt()
 
-        cls()
+        utils.cls()
         border_len = len(self.name)
 
         print(":" * border_len)
         print(self.name)
         print(":" * border_len + "\n")
 
-        wrapStr(self.desc)
+        utils.wrap_str(self.desc)
         print("")
 
         if self.ground:
@@ -49,26 +53,26 @@ class TravelTile(object):
 
             for item in self.ground:
                 if self.ground[item] > 1:
-                    print(wItems[item].name + " (%d)" % self.ground[item])
+                    print(data.wItems[item].name + " (%d)" % self.ground[item])
                 else:
-                    print(wItems[item].name)
+                    print(data.wItems[item].name)
         else:
             print("There are no items on the ground.")
 
         print("")
 
         if self.north:
-            print("NORTH: %s" % wTiles[self.north].name)
+            print("NORTH: %s" % data.wTiles[self.north].name)
         if self.south:
-            print("SOUTH: %s" % wTiles[self.south].name)
+            print("SOUTH: %s" % data.wTiles[self.south].name)
         if self.east:
-            print("EAST: %s" % wTiles[self.east].name)
+            print("EAST: %s" % data.wTiles[self.east].name)
         if self.west:
-            print("WEST: %s" % wTiles[self.west].name)
+            print("WEST: %s" % data.wTiles[self.west].name)
         if self.up:
-            print("UP: %s" % wTiles[self.up].name)
+            print("UP: %s" % data.wTiles[self.up].name)
         if self.down:
-            print("DOWN: %s" % wTiles[self.down].name)
+            print("DOWN: %s" % data.wTiles[self.down].name)
 
         # events will appear under this border
         print("")
@@ -92,32 +96,32 @@ class NPCTile(TravelTile):
         Prints location information and sets visited status
         to True
         """
-        cls()
+        utils.cls()
 
         if not self.visited and self.on_first_visit:
             self.visited = True
 
             for paragraph in self.on_first_visit:
-                cls()
-                wrapStr(paragraph)
+                utils.cls()
+                utils.wrap_str(paragraph)
                 print("\nPress ENTER to continue.\n")
-                dialoguePrompt()
+                utils.dialogue_prompt()
 
-        cls()
+        utils.cls()
         border_len = len(self.name)
 
         print(":" * border_len)
         print(self.name)
         print(":" * border_len + "\n")
 
-        wrapStr(self.desc)
+        utils.wrap_str(self.desc)
         print("")
 
         if self.npc:
             print("People in this area:")
 
             for person in self.npc:
-                print(wNPC[person].name)
+                print(data.wNPC[person].name)
 
             print("")
 
@@ -126,27 +130,27 @@ class NPCTile(TravelTile):
 
             # Printing item count if there are multiple copies
             for item in self.ground:
-                if wItems[item] > 1:
-                    print(wItems[item].name + " (%d)" % self.ground[item])
+                if data.wItems[item] > 1:
+                    print(data.wItems[item].name + " (%d)" % self.ground[item])
                 else:
-                    print(wItems[item].name)
+                    print(data.wItems[item].name)
         else:
             print("There are no items on the ground.")
 
         print("")
 
         if self.north:
-            print("NORTH: %s" % wTiles[self.north].name)
+            print("NORTH: %s" % data.wTiles[self.north].name)
         if self.south:
-            print("SOUTH: %s" % wTiles[self.south].name)
+            print("SOUTH: %s" % data.wTiles[self.south].name)
         if self.east:
-            print("EAST: %s" % wTiles[self.east].name)
+            print("EAST: %s" % data.wTiles[self.east].name)
         if self.west:
-            print("WEST: %s" % wTiles[self.west].name)
+            print("WEST: %s" % data.wTiles[self.west].name)
         if self.up:
-            print("UP: %s" % wTiles[self.up].name)
+            print("UP: %s" % data.wTiles[self.up].name)
         if self.down:
-            print("DOWN: %s" % wTiles[self.down].name)
+            print("DOWN: %s" % data.wTiles[self.down].name)
 
         # events will appear under this border
         print("")

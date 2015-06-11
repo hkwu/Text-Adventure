@@ -1,11 +1,10 @@
 import os
-import string
 import textwrap
 
 SCREEN_WIDTH = 75
 
 # Utility functions
-def wrapStr(string):
+def wrap_str(string):
     """
     Textwraps a string using SCREEN_WIDTH 
     and joins them with newlines, then prints
@@ -32,9 +31,9 @@ def cls():
     os.system("cls" if os.name == "nt" else "clear")
 
 
-def dialoguePrompt():
+def dialogue_prompt():
     """Special prompt for dialogue sequences that allows quitting"""
-    choice = input("> ")
+    choice = raw_input("> ")
     if choice.lower() == "q" or choice.lower() == "quit":
         cls()
         print("Game Over!")
