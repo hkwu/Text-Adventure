@@ -8,12 +8,12 @@ import utils
 # Base entity
 class Entity(object):
     def __init__(self, name, loc, inv,
-                 credits, weapon, armour,
+                 money, weapon, armour,
                  desc, gender):
         self.name = name
         self.loc = loc
         self.inv = inv
-        self.credits = credits
+        self.money = money
         self.weapon = weapon
         self.armour = armour
         self.desc = desc
@@ -89,6 +89,7 @@ class Player(Entity):
             self.loc.location()
             print("There is nothing over there!")
 
+    ### NEED TO FIX THIS ###
     def take(self, item):
         """Moves pickable item to player's inventory"""
         case_proper = string.capwords(item)
@@ -99,9 +100,9 @@ class Player(Entity):
             print("What are you trying to take?")
         elif case_proper == "All" and self.loc.ground:
             for item in self.loc.ground:
-                if item in self.inv:
+                if data.wItems[item].pickable and item in self.inv:
                     self.inv[item] += self.loc.ground[item]
-                else:
+                elif data.wItems[item].pickable:
                     self.inv[item] = self.loc.ground[item]
 
             self.loc.ground = {}
@@ -168,6 +169,20 @@ class Player(Entity):
         else:
             self.loc.location()
             print("You don't even have one of those.")
+
+    def examine_item(self, item):
+        """Examines an item on the ground."""
+        case_proper = string.capwords(item)
+
+        for item in self.loc.ground:
+            if case_proper == data.wItems[item].name:
+                print("You examine the %s.\n" % data.wItems[item].name)
+                utils.wrap_str(data.wItems[item].desc)
+                print("\nIt is worth %d coins." % data.wItems[item].price)
+
+                break
+        else:
+            print("That doesn't even exist here.")
 
 
 # NPC entities

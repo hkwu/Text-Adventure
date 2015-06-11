@@ -13,9 +13,6 @@ import cmd
 import entities
 import utils
 
-# Entity instances
-player = entities.Player("Test")
-
 
 # CMD interface class
 class InputCmd(cmd.Cmd):
@@ -69,6 +66,10 @@ class InputCmd(cmd.Cmd):
     def do_drop(self, arg):
         """Drop an item."""
         player.drop(arg)
+
+    def do_examine(self, arg):
+        """Examine a person or item."""
+        player.examine_item(arg)
 
     # Help topics
     def help_general(self):
